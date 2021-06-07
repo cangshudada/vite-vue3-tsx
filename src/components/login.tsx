@@ -28,12 +28,15 @@ export default defineComponent({
               name: "home",
             });
 
+            localStorage.setItem("user", JSON.stringify(data.user));
             dispatch(`login/${SET_USER}`, data.user);
           } else {
             data.user = {
               name: "",
               password: "",
             };
+
+            localStorage.removeItem("user");
             ElMessage.error("用户名或密码错误");
           }
         } else {
