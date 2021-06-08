@@ -1,6 +1,6 @@
 import { defineComponent, ref } from "vue";
 import { RouterView } from "vue-router";
-import "@/assets/base.css"
+import "@/assets/base.less"
 
 export default defineComponent({
   setup() {

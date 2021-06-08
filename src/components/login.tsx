@@ -2,8 +2,16 @@ import { useStore } from "vuex";
 import { IUser } from "@/store/login";
 import { useRouter } from "vue-router";
 import { SET_USER } from "@/store/login/actionType";
-import { defineComponent, ref, reactive } from "vue";
-import { ElForm, ElFormItem, ElInput, ElButton, ElMessage } from "element-plus";
+import { defineComponent, ref, reactive, onMounted } from "vue";
+import {
+  ElForm,
+  ElInput,
+  ElButton,
+  ElMessage,
+  ElTooltip,
+  ElFormItem,
+  ElNotification,
+} from "element-plus";
 
 export default defineComponent({
   setup() {
@@ -18,6 +26,15 @@ export default defineComponent({
     const loginForm = ref<typeof ElForm | null>(null);
     const { dispatch } = useStore();
     const router = useRouter();
+
+    onMounted(() => {
+      ElNotification({
+        type: "info",
+        title: "账户信息",
+        dangerouslyUseHTMLString: true,
+        message: "账号：<strong>admin</strong>  密码：<strong>123456</strong>",
+      });
+    });
 
     function login() {
       if (!loginForm.value) return;
@@ -85,15 +102,17 @@ export default defineComponent({
             }}
           ></ElInput>
         </ElFormItem>
-        <ElFormItem>
-          <ElButton
-            type="primary"
-            {...{
-              onClick: login,
-            }}
-          >
-            登陆
-          </ElButton>
+        <ElFormItem class="login-button">
+          <ElTooltip placement="top" content="账号：admin 密码：123456">
+            <ElButton
+              type="primary"
+              {...{
+                onClick: login,
+              }}
+            >
+              登陆
+            </ElButton>
+          </ElTooltip>
         </ElFormItem>
       </ElForm>
     );
