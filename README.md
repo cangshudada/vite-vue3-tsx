@@ -83,7 +83,7 @@ yarn create @vitejs/app
 
 接着你想输入的项目名称，回车之后就会出现让你选择模版预设的选项：
 
-<img src="/Users/knulp/Library/Application Support/typora-user-images/image-20210608173556878.png" alt="image-20210608173556878" style="zoom:50%;" />
+<img src="https://github.com/cangshudada/vite-vue-tsx/tree/main/public/source/1.png" alt="image-20210608173556878" style="zoom:50%;" />
 
 可以看到预设是比较多的，官网上给出了当前支持的预设模版：
 
@@ -104,7 +104,7 @@ yarn create @vitejs/app
 
 然后让我们接着选择 **vue-ts**，回车之后脚手架就帮我们把项目构建好了。
 
-<img src="/Users/knulp/Library/Application Support/typora-user-images/image-20210608173943271.png" alt="image-20210608173943271" style="zoom:50%;" />
+<img src="https://github.com/cangshudada/vite-vue-tsx/tree/main/public/source/2.png" alt="image-20210608173943271" style="zoom:50%;" />
 
 下面是构建完成的目录结构：
 
