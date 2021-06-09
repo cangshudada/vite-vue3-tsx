@@ -44,7 +44,8 @@ export default defineComponent({
         <br />
         {slots.default && slots.default()}
         <br />
-        prefix插槽内容 : {slots.prefix && slots.prefix()}
+        {slots.suffix && slots.suffix("作用域插槽示例")}
+        prefix具名插槽内容 : {slots.prefix && slots.prefix()}
       </div>
     );
   },

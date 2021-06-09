@@ -1,9 +1,10 @@
-import Child from "@/components/child";
-import TodoList from "@/components/todoList";
 import { useStore, Dispatch } from "vuex";
 import { defineComponent, ref } from "vue";
 import { useRouter, Router } from "vue-router";
 import { SET_USER } from "@/store/login/actionType";
+
+import Child from "@/components/child";
+import TodoList from "@/components/todoList";
 
 import {
   ElSkeleton,
@@ -75,6 +76,7 @@ export default defineComponent({
             size="small"
             v-slots={{
               prefix: <i class="el-icon-star-on"></i>,
+              suffix: (props: string) => <div>{props}</div>,
             }}
             {...{
               onChangePswVisible(flag: boolean) {

@@ -15,7 +15,7 @@
 - [x] vuex
 - [x] Element-plus
 
-上述功能再结合axios笔者认为大部分小项目需求都足以胜任，如果有有兴趣的同学欢迎fork代码体验一番,也欢迎各位提交issue交流。
+上述功能再结合axios我认为大部分小项目需求都足以胜任，如果有有兴趣的同学欢迎fork代码体验一番,也欢迎各位提交issue交流。
 
 
 
@@ -177,9 +177,9 @@ export default defineComponent({
 })
 ```
 
-接着重新运行`yarn dev`就可以再页面上看到熟悉的hello world了。是的你没有看错，就这么简单。
+接着重新运行`yarn dev`就可以在页面上看到熟悉的hello world了。是的你没有看错，就这么简单。
 
-这边笔者在这个时候遇到了一个小问题，就是3000端口被占了，这个时候怎么配置vite的端口配置，实际vite的官网都写得比较清楚，由于`vite.config.ts`也有相关的类型提示，所以问题解决得也很快，在`vite.config.ts`中新增一个serve对象，并设置端口就行了，此时配置如下：
+这边我在这个时候遇到了一个小问题，就是3000端口被占了，这个时候怎么配置vite的端口配置，实际vite的官网都写得比较清楚，由于`vite.config.ts`也有相关的类型提示，所以问题解决得也很快，在`vite.config.ts`中新增一个serve对象，并设置端口就行了，此时配置如下：
 
 ```typescript
 import { defineConfig } from "vite";
@@ -529,4 +529,281 @@ createApp(App).use(router).use(store).mount("#app");
 
 
 #### Element-plus引入
+
+其实element-plus的引入官网已经介绍得十分详细了，这边就以按需引入的方式来做演示。
+
+##### 安装
+
+```bash
+$ npm install element-plus
+# or
+$ yarn add element-plus
+```
+
+然后安装vite样式引入插件
+
+```bash
+$ npm install vite-plugin-style-import -D
+# or
+$ yarn add vite-plugin-style-import -D
+```
+
+
+
+##### 配置
+
+接着在`vite.config.ts`中如下配置即可
+
+```typescript
+import { resolve } from "path";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import vueJsx from "@vitejs/plugin-vue-jsx";
+import styleImport from "vite-plugin-style-import";
+
+export default ({ mode }) => // vite配置文件中环境变量可以以如下方式取到
+  defineConfig({
+    plugins: [
+      vue(),
+      vueJsx(),
+      styleImport({
+        libs: [
+          {
+            libraryName: "element-plus",
+            esModule: true,
+            ensureStyleFile: true,
+            resolveStyle: (name) => {
+              return `element-plus/lib/theme-chalk/${name}.css`;
+            },
+            resolveComponent: (name) => {
+              return `element-plus/lib/${name}`;
+            },
+          },
+        ],
+      }),
+    ],
+    base: mode === "development" ? "/" : "./", //此时把环境打包路径也配置好，避免生产环境打包出现白屏
+    server: {
+      port: 8888,
+    },
+    resolve: {
+      alias: {
+        "@": resolve(__dirname, "/src"),
+      },
+    },
+  });
+```
+
+然后`main.ts`中引入样式文件，之后便可以按需直接在组件中使用`element-plus`了
+
+```typescript
+// main.ts
+import App from "./App";
+import store from "./store";
+import router from "./router";
+import { createApp } from "vue";
+import "element-plus/lib/theme-chalk/index.css";
+
+createApp(App).use(router).use(store).mount("#app");
+```
+
+
+
+### 项目解析
+
+#### jsx/tsx语法规范
+
+如果有过react的开发经验，可以发现除了vue中独有的几个新概念：`slot`、`directive`、`emit`等以外，大部分支持vue的jsx语法规范和react的都是一样的，相同的部分我就不多说了，大家不了解的可以翻下文档很快就能理解，不同的接下来我就一个个的结合代码进行举例示范：
+
+
+
+##### Fragment
+
+在vue3的模版语法中是支持解析多根节点的语法结构的，比如这样：
+
+```vue
+<template>
+  <div></div>
+  <div></div>
+  <div></div>
+</template>
+```
+
+但是使用jsx的方式是不支持这种写法的，还是必须只有一个根结点，这个时候我们可以和react一样通过添加一个虚拟节点来完成同样的需求：
+
+```tsx
+const App = () => (
+  <>
+    <span>I'm</span>
+    <span>Fragment</span>
+  </>
+);
+```
+
+
+
+##### 指令
+
+`@vue/babel-plugin-jsx`帮我们解析了几个常见的vue指令，比如`v-show`、`v-model`,这两个的用法和功能与vue中一摸一样，就不多赘述了，接下来说几个常见但是需要自己实现的指令功能：
+
+- v-bind
+
+```tsx
+import { defineComponent, ref } from "vue";
+const App = defineComponent({
+  setup(){
+    const size = ref<"large" | "medium" | "small" | "mini">("mini")
+    return () => 
+      <Button size={size.value}></Button> //此处直接换成jsx的模版语法 效果和v-bind是一致的
+  }
+});
+```
+
+- v-if
+
+使用条件判断语句来实现v-if的功能，与react中一致。
+
+```tsx
+const App = () => (
+  <>
+   {
+     condition ?  <span>A</span> : <span>B</span>
+   }
+  </>
+);
+```
+
+- v-for
+
+和react中一样，采用map循环的方式
+
+```tsx
+import { defineComponent, ref } from "vue";
+const App = defineComponent({
+  setup(){
+    const list = ref<string[]>([])
+    return () => {
+      list.value.map((data,index) => <p key={index}>{data}</p>)
+    }
+  }
+});
+```
+
+- 自定义指令
+
+首先创建自定义指令
+
+```typescript
+import { ObjectDirective } from "vue";
+
+const foucsDirective: ObjectDirective<HTMLElement, any> = {
+  mounted(el) {
+    switch (el.tagName) {
+      case "INPUT":
+        el.focus();
+        break;
+      default:
+        const input = el.querySelector("input");
+        input?.focus();
+        break;
+    }
+  },
+};
+
+export default foucsDirective;
+```
+
+全局引入
+
+```typescript
+import App from "./App";
+import store from "./store";
+import router from "./router";
+import { createApp } from "vue";
+import foucsDirective from "@/directive/focus";
+import "element-plus/lib/theme-chalk/index.css";
+
+const app = createApp(App);
+
+// 全局挂载指令
+app.directive("focus",foucsDirective);
+
+app.use(router).use(store).mount("#app");
+```
+
+局部引入
+
+```tsx
+import { defineComponent, ref } from "vue";
+import foucsDirective from "@/directive/focus";
+
+const App = defineComponent({
+  directives: { focus: foucsDirective },
+  setup(){
+    const value = ref<string>("")
+    return () => <input type="text" v-focus v-model={value.value}/>
+  }
+});
+```
+
+
+
+##### 插槽
+
+不像 react，component 自带一个 children 的 props，vue 的自定义组件嵌套全得靠 slot，所以在jsx中想要实现vue中的插槽写法也有很大不同。
+
+```tsx
+import { defineComponent } from "vue";
+
+// 子组件
+const Child = defineComponent({
+  setup(props, { slots }) {
+    return () => (
+      <>
+        默认插槽: {slots.default && slots.default()}
+        <br />
+        具名插槽: {slots.prefix && slots.prefix()}
+        <br />
+        作用域插槽:{slots.suffix && slots.suffix({ name: "这是作用域插槽的示范" })}
+      </>
+    );
+  },
+});
+
+// 父组件
+const Father = defineComponent({
+  setup() {
+    return () => (
+      <Child
+        v-slots={{
+          prefix: <i class="el-icon-star-on"></i>, // 具名插槽
+          suffix: (props: Record<"name", string>) => <span>{props.name}</span>, // props可作插槽作用域的作用
+        }}
+      >
+        这是默认插槽的示范
+      </Child>
+    );
+  },
+});
+
+export default Father
+```
+
+由上述的简单例子很容易就能总结出vue中默认插槽、具名插槽以及作用域插槽的用法，它渲染的结果如下：
+
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue-tsx/main/public/source/3.png" alt="image-20210608173943271" style="zoom:50%;" />
+
+> 这里有一个坑，v-slots中直接传入defineComponent包裹的组件将不会执行渲染
+
+```tsx
+const Test1 = defineComponent({
+  setup() {
+    return <i class="el-icon-star-on"></i>;
+  },
+}); // 错误 此组件作为slot传入子组件不会被成功渲染
+
+const Test2 = () => <i class="el-icon-star-on"></i> // 正确 此组件作为slot传入子组件会被成功渲染
+```
+
+
 
