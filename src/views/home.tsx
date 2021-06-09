@@ -1,5 +1,5 @@
-import Child from "./child";
-import TodoList from "./todoList";
+import Child from "@/components/child";
+import TodoList from "@/components/todoList";
 import { useStore, Dispatch } from "vuex";
 import { defineComponent, ref } from "vue";
 import { useRouter, Router } from "vue-router";

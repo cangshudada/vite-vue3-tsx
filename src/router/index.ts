@@ -1,4 +1,10 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
+import {
+  createRouter,
+  RouteRecordRaw,
+  NavigationGuardNext,
+  createWebHashHistory,
+  RouteLocationNormalized,
+} from "vue-router";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -11,7 +17,7 @@ const routes: RouteRecordRaw[] = [
     meta: {
       type: "home",
     },
-    component: () => import("../components/home"),
+    component: () => import("@/views/home"),
   },
   {
     path: "/login",
@@ -19,12 +25,12 @@ const routes: RouteRecordRaw[] = [
     meta: {
       type: "login",
     },
-    component: () => import("../components/login"),
+    component: () => import("@/views/login"),
   },
   {
     path: "/:pathMatch(.*)*",
     name: "404",
-    component: () => import("../components/404"),
+    component: () => import("@/views/404"),
   },
 ];
 
@@ -33,19 +39,25 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to, from, next) => {
-  const user = localStorage.getItem("user");
-  if (to.meta.type === "login" && user) {
-    next({ name: "home" });
-    return;
-  }
+router.beforeEach(
+  (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: NavigationGuardNext
+  ) => {
+    const user = localStorage.getItem("user");
+    if (to.meta.type === "login" && user) {
+      next({ name: "home" });
+      return;
+    }
 
-  if (to.meta.type === "home" && !user) {
-    next({ name: "login" });
-    return;
-  }
+    if (to.meta.type === "home" && !user) {
+      next({ name: "login" });
+      return;
+    }
 
-  next();
-});
+    next();
+  }
+);
 
 export default router;
