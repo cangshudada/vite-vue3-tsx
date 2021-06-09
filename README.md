@@ -299,7 +299,7 @@ $ yarn add vue-router@4.0.8
 
 在 src 目录下创建以下目录结构：
 
-```bash
+```basic
 - src
   |- router
   |   index.ts
@@ -414,6 +414,119 @@ export default defineComponent({
 
 #### vuex配置
 
+##### 安装
+
+> 请注意，vuex也得安装4.0.0及以上版本，最好直接安装当前最新版本。
+
+查看 vuex 版本：
+
+```bash
+$ npm info vuex versions
+```
+
+直接安装最新版 vue-router：
+
+```bash
+$ npm install vuex@4.0.1
+# or
+$ yarn add vuex@4.0.1
+```
+
+在 src 目录下创建以下目录结构：
+
+```basic
+- src
+  |- store
+  |  | index.ts 
+  |  |- home
+  |  |  | index.ts
+  |  |  | actionType.ts
+  |  |- login
+  |  |  | index.ts
+  |  |  | actionType.ts
+```
+
+##### 配置
+
+vue3中的vuex配置和vue2基本上相同，这里我就直接采用模块化的方式创建作为演示了。
+
+首先配置主入口
+
+```typescript
+# store/index.ts
+import { createStore } from "vuex"
+import home from "./home";
+import login from "./login"
+
+// 此处和router类似
+const store = createStore({
+    state: {},
+    getters: {},
+    mutations: {},
+    actions: {},
+    modules: {
+        home,
+        login
+    }
+})
+
+export default store
+```
+
+后面我就只拿login这个模块仓库做相关代码演示了
+
+```typescript
+# store/login/index.ts
+import { Module } from "vuex";
+import { SET_USER } from "./actionType";
+
+export type IUser = Record<"name" | "password", string>;
+
+export interface ILoginState {
+  user: IUser;
+}
+
+// Module这个类型可以传两个范型变量 第一个是当前模块state的对象接口类型 第二个是主仓库state的对象接口类型 
+const LoginStore: Module<ILoginState, {}> = {
+  namespaced: true,
+  state: {
+    user: {
+      name: "",
+      password: "",
+    },
+  },
+  getters: {},
+  mutations: {
+    [SET_USER](state, payload: IUser) {
+      state.user = payload;
+    },
+  },
+  actions: {
+    [SET_USER]({ commit }, payload: IUser) {
+      commit(SET_USER, payload);
+    },
+  },
+};
+
+export default LoginStore;
+```
+
+其实从代码可以看出和vue2的基本上没有差别，让我比较无语的是升级后的vuex对ts的支持依旧不是很给力，声明文件中很多any类型，导致基本上无法用到ts类型提示的优势，这个看后期官方能不能优化吧，当然现在社区也有相关的解决方案，有兴趣的可以移步这里 [一个让 vuex 更好的支持 typescript 的解决方案](https://juejin.cn/post/6844903871219761159)
+
+现在状态仓库创建完了，接着和引入路由一样引入store就行了
+
+```typescript
+import App from './App'
+import store from "@/store"
+import router from "@/router"
+import { createApp } from 'vue'
+
+createApp(App).use(router).use(store).mount("#app");
+```
+
+后边vuex在组件中的使用方法我会结合组件内的代码来做相关演示。
+
 
 
 #### Element-plus引入
+
