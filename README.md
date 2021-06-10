@@ -497,6 +497,7 @@ const LoginStore: Module<ILoginState, {}> = {
   },
   getters: {},
   mutations: {
+    // 此处注意不要把state解构，不要将丧失响应式能力
     [SET_USER](state, payload: IUser) {
       state.user = payload;
     },
@@ -806,4 +807,218 @@ const Test2 = () => <i class="el-icon-star-on"></i> // 正确 此组件作为slo
 ```
 
 
+
+##### emit
+
+vue中子向父传值一般都是emit的方式，这个在vue3中大致写法相似，只是多了一个定义emit的步骤，这也是为了后续的类型推倒做准备。
+
+```jsx
+import { defineComponent } from "vue";
+
+// 子组件
+const Child = defineComponent({
+  emits: ["click"],
+  setup(props ,{ emit }) {
+    return () => (
+      <button onClick={() => {emit("click")}}>点我触发emit</button>
+    );
+  },
+});
+
+// 父组件
+const Father = defineComponent({
+  setup() {
+    return () => (
+      <Child onClick={() => {
+          console.log("emit 触发了")
+      }}/>
+    );
+  },
+});
+```
+
+这种方式本没有问题，但是在tsx中由于子组件props中没有相关emit事件的类型声明，就会报错
+
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue-tsx/main/public/source/4.png" alt="image-20210608173943271" style="zoom:50%;" />
+
+但是实际功能是能够触发的，这里只是类型检测出现了异常。有时候遇到了没能兼容tsx写法形式(比如element-plus = =)的库，又不想有红色报错，这个时候其实可以这么处理：
+
+```tsx
+import { defineComponent } from "vue";
+
+// 子组件
+const Child = defineComponent({
+  emits: ["click"],
+  setup(props ,{ emit }) {
+    return () => (
+      <button onClick={() => {emit("click")}}>点我触发emit</button>
+    );
+  },
+});
+
+// 父组件
+const Father = defineComponent({
+  setup() {
+    return () => (
+      <Child {...{  // 避免出现因为类型检测导致的报错 此方法可适用于任何不存在props类型声明的参数
+        onClick:() => {
+          console.log("emit 触发了")
+        }
+      }}/>
+    );
+  },
+});
+```
+
+但是这个其实也是一个曲线救国的方案，所以如果大家有开发库的打算或者平时打算用vue3结合tsx写项目，最好还是使用下面的方式，做个兼容处理：
+
+```tsx
+import { defineComponent, PropType } from "vue";
+
+// 子组件
+const Child = defineComponent({
+  emits: ["click"], // 传统template写法
+  props: {
+    onClick: Function as PropType<(event:MouseEvent) => void> // 兼容tsx写法，让事件有类型声明
+  },
+  setup(props ,{ emit }) {
+    return () => (
+      <button onClick={(event:MouseEvent) => {emit("click",event)}}>点我触发emit</button>
+    );
+  },
+});
+
+// 父组件
+const Father = defineComponent({
+  setup() {
+    return () => (
+      <Child onClick={(event:MouseEvent) => { // 此处便不会出现类型报错 并且有好的类型提示
+          console.log("emit 触发了")
+      }}/>
+    );
+  },
+});
+```
+
+
+
+##### tsx Render方式
+
+tsx目前还支持render方式的写法，这种写法目前也是大多数开源UI库的写法，个人比较推荐这种写法，它将逻辑层和模板层分开后期更易维护
+
+```tsx
+import { ref, renderSlot, onUnmounted, defineComponent } from "vue";
+
+// 带render函数的组件 优点：可将逻辑区与模版区分开
+export const RenderComponent = defineComponent({
+  props: {
+    title: String,
+  },
+  // 逻辑层
+  setup() {
+    const count = ref<number>(1);
+
+    const timer = setInterval(() => {
+      count.value++;
+    }, 2000);
+
+    onUnmounted(() => {
+      clearInterval(timer);
+    });
+
+    return {
+      count,
+    };
+  },
+  // 渲染层
+  render() {
+    // render函数在响应式数据发生更改时会自动触发（与react类似）
+    const { count, $slots, title } = this;
+    return (
+      <div class="render-component">
+        {renderSlot($slots, "prefix")} {count}
+        <br />
+        这是props：{title}
+        <br />
+        {renderSlot($slots, "default")}
+      </div>
+    );
+  },
+});
+```
+
+
+
+#### router和vuex项目中使用
+
+##### router项目中的使用
+
+```tsx
+import { defineComponent } from "vue";
+import { useRouter, useRoute, RouterView } from "vue-router";
+
+const App = defineComponent({
+  setup(){
+    const router = useRouter();
+    const route = useRoute();
+    
+    function go(pathName:string){
+      // 跳转路由
+      router.push({
+        name: pathName,
+        query: {
+          value: "路由传参"
+        }
+      })
+      
+      // 取路由传递的参数 params的同理
+      const { query } = route;
+      console.log(query)
+    }
+    
+    return () => <>
+      <button onClick={() => {go('home')}}>跳转home</button>
+      <button onClick={() => {go('login')}}>跳转login</button>
+      <RouterView />
+    </>
+  }
+});
+```
+
+
+
+##### vuex项目中的使用
+
+```tsx
+import { useStore } from "vuex";
+import { SET_USER } from "@/store/login/actionType";
+import { defineComponent, computed, readonly } from "vue";
+
+const App = defineComponent({
+  setup(){
+    // 暴露state以及dispatch
+    const { state, dispatch } = useStore();
+    // 此处最好用readonly包裹暴露出的state，让其成为只读属性 避免直接修改
+    const loginState = computed(() => readonly(store.state.login));
+    
+    function modifyUserInfo(){
+      // 直接调用dispatch 用法和vue2中一致
+      dispatch(`login/${SET_USER}`,{})
+    }
+    
+    return () => <>
+      <button onClick={modifyUserInfo}>修改state</button>
+      <div>{loginState.user} {loginState.password}</div>
+    </>
+  }
+});
+```
+
+
+
+## 结语
+
+至此相关示例解析就全部结束了，本文示例源码在这个仓库 [vite-vue3-tsx](https://github.com/cangshudada/vite-vue3-tsx) 有兴趣的欢迎fork下来跑一跑，也能对vue3相关语法更加熟悉。
+
+我本人写此文章也只是帮助初学vue3和tsx的同学建立一个较完善的框架，文章肯定也有本人认知不甚清晰的地方，欢迎各位多多交流，互相进步！
 

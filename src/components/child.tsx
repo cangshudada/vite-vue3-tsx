@@ -1,5 +1,6 @@
-import { defineComponent, PropType, ref } from "vue";
 import { ElButton } from "element-plus";
+import { RenderComponent } from "./renderComponent";
+import { defineComponent, PropType, ref } from "vue";
 
 export const validatorComponentSize = (value: string): boolean =>
   ["", "large", "medium", "small", "mini"].includes(value);
@@ -24,9 +25,18 @@ export default defineComponent({
       default: "medium",
       validator: (val: string) => validatorComponentSize(val),
     },
+    onChangePswVisible: {
+      type: Function as PropType<(flag: boolean) => void>,
+    },
   },
   setup(props, { emit, slots }) {
     const flag = ref<boolean>(false);
+    const title = ref<string>("xixi");
+
+    setTimeout(() => {
+      title.value = "haha";
+    }, 2000);
+
     return () => (
       <div class="child">
         <ElButton
@@ -46,6 +56,15 @@ export default defineComponent({
         <br />
         {slots.suffix && slots.suffix("作用域插槽示例")}
         prefix具名插槽内容 : {slots.prefix && slots.prefix()}
+        <br />
+        <RenderComponent
+          title={title.value}
+          v-slots={{
+            prefix: <i class="el-icon-medal-1"></i>,
+          }}
+        >
+          这是render形式的组件示例
+        </RenderComponent>
       </div>
     );
   },

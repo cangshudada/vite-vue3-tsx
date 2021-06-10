@@ -78,12 +78,10 @@ export default defineComponent({
               prefix: <i class="el-icon-star-on"></i>,
               suffix: (props: string) => <div>{props}</div>,
             }}
-            {...{
-              onChangePswVisible(flag: boolean) {
-                password.value = flag
-                  ? store.state.login.user.password
-                  : store.state.login.user.password.replace(/[\s\S]/g, "*");
-              },
+            onChangePswVisible={(flag) => {
+              password.value = flag
+                ? store.state.login.user.password
+                : store.state.login.user.password.replace(/[\s\S]/g, "*");
             }}
           >
             这是一段默认插槽的内容
