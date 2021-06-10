@@ -83,7 +83,7 @@ $ yarn create @vitejs/app
 
 接着你想输入的项目名称，回车之后就会出现让你选择模版预设的选项：
 
-<img src="https://raw.githubusercontent.com/cangshudada/vite-vue-tsx/main/public/source/1.png" alt="image-20210608173556878" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue3-tsx/main/public/source/1.png" alt="image-20210608173556878" style="zoom:50%;" />
 
 可以看到预设是比较多的，官网上给出了当前支持的预设模版：
 
@@ -104,7 +104,7 @@ $ yarn create @vitejs/app
 
 然后让我们接着选择 **vue-ts**，回车之后脚手架就帮我们把项目构建好了。
 
-<img src="https://raw.githubusercontent.com/cangshudada/vite-vue-tsx/main/public/source/2.png" alt="image-20210608173943271" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue3-tsx/main/public/source/2.png" alt="image-20210608173943271" style="zoom:50%;" />
 
 下面是构建完成的目录结构：
 
@@ -792,7 +792,7 @@ export default Father
 
 由上述的简单例子很容易就能总结出vue中默认插槽、具名插槽以及作用域插槽的用法，它渲染的结果如下：
 
-<img src="https://raw.githubusercontent.com/cangshudada/vite-vue-tsx/main/public/source/3.png" alt="image-20210608173943271" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue3-tsx/main/public/source/3.png" alt="image-20210608173943271" style="zoom:50%;" />
 
 > 这里有一个坑，v-slots中直接传入defineComponent包裹的组件将不会执行渲染
 
@@ -839,7 +839,7 @@ const Father = defineComponent({
 
 这种方式本没有问题，但是在tsx中由于子组件props中没有相关emit事件的类型声明，就会报错
 
-<img src="https://raw.githubusercontent.com/cangshudada/vite-vue-tsx/main/public/source/4.png" alt="image-20210608173943271" style="zoom:50%;" />
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue3-tsx/main/public/source/4.png" alt="image-20210608173943271" style="zoom:50%;" />
 
 但是实际功能是能够触发的，这里只是类型检测出现了异常。有时候遇到了没能兼容tsx写法形式(比如element-plus = =)的库，又不想有红色报错，这个时候其实可以这么处理：
 
