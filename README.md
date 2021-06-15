@@ -7,6 +7,7 @@
 ## 已实现的相关功能示范
 
 - [x] typescript
+- [x] eslint
 - [x] vue3大部分语法示例
 - [x] vite脚手架配置
 - [x] tsx开发模式
@@ -137,6 +138,114 @@ $ yarn create @vitejs/app
 
 
 ### 项目改造
+
+#### 配置eslint
+
+增加eslint用来规范`Typescript`以及`vue`代码，首先安装相关依赖：
+
+```bash
+yarn add eslint eslint-plugin-vue @typescript-eslint/parser @typescript-eslint/eslint-plugin -D
+```
+
+这三个依赖的作用分别是：
+
+- eslint: ESLint的核心代码
+- eslint-plugin-vue：ESLint关于检测vue代码规范的插件
+- @typescript-eslint/parser：ESLint的解析器，用于解析typescript，从而检查和规范Typescript代码
+- @typescript-eslint/eslint-plugin：这是一个ESLint插件，包含了各类定义好的检测Typescript代码的规范
+
+
+
+结合Prettier和Eslint
+
+```bash
+yarn add prettier eslint-config-prettier eslint-plugin-prettier -D
+```
+
+其中：
+
+- prettier：prettier插件的核心代码
+- eslint-config-prettier：解决ESLint中的样式规范和prettier中样式规范的冲突，以prettier的样式规范为准，使ESLint中的样式规范自动失效
+- eslint-plugin-prettier：将prettier作为ESLint规范来使用
+
+
+
+依赖装好之后便可以开始相关文件的配置工作了，首先在项目根目录新增`.eslintrc.js`文件
+
+> 这个地方遇到了一个坑，如果`eslint-config-prettier`版本号在8.0.0以上，则在`.eslintrc.js`配置extends中不需要再新增 *'prettier/@typescript-eslint'* 这个配置，否则执行eslint会报错
+
+```javascript
+module.exports = {
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    parser: '@typescript-eslint/parser', // Specifies the ESLint parser
+    ecmaVersion: 2020, // Allows for the parsing of modern ECMAScript features
+    sourceType: 'module', // Allows for the use of imports
+    ecmaFeatures: {
+      // Allows for the parsing of JSX
+      jsx: true
+    }
+  },
+  extends: [
+    'plugin:vue/vue3-recommended',
+    'plugin:@typescript-eslint/recommended', 
+    'plugin:prettier/recommended'
+  ],
+  rules: {}
+}
+```
+
+紧接着增加**prettier**配置，再在项目根目录中新增`.prettierrc.js`文件
+
+```javascript
+// 具体配置可以参考 https://prettier.io/docs/en/options.html
+module.exports = {
+  printWidth: 100,
+  tabWidth: 2,
+  useTabs: false,
+  semi: false, // 未尾逗号
+  vueIndentScriptAndStyle: true,
+  singleQuote: true, // 单引号
+  quoteProps: 'as-needed',
+  bracketSpacing: true,
+  trailingComma: 'none', // 未尾分号
+  jsxBracketSameLine: false,
+  jsxSingleQuote: false,
+  arrowParens: 'always',
+  insertPragma: false,
+  requirePragma: false,
+  proseWrap: 'never',
+  htmlWhitespaceSensitivity: 'strict',
+  endOfLine: 'lf'
+};
+```
+
+做到这里，eslint除了脚本配置之外就配置完成了，现在只需在`package.json`中配置好脚本命令就完成了整个eslint的配置工作了。
+
+```json
+{
+  ...
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit --skipLibCheck && vite build", // 增加skipLibCheck可以跳过引入库的ts检查
+    "serve": "vite preview",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix --ext .ts,.tsx"
+  },
+}
+```
+
+现在我们试一下eslint检测的结果：
+
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue3-tsx/main/public/source/5.png" alt="image-20210608173943271" style="zoom:50%;" />
+
+可以看到eslint已经成功执行代码检查了，接着我们自动修复一下：
+
+<img src="https://raw.githubusercontent.com/cangshudada/vite-vue3-tsx/main/public/source/6.png" alt="image-20210608173943271" style="zoom:50%;" />
+
+eslint的自动修复也成功了，至此为止eslint的配置就完成了。
+
+
 
 #### tsx支持
 

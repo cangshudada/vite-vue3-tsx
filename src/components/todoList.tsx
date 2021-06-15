@@ -1,39 +1,32 @@
-import { defineComponent, ref } from "vue";
-import foucsDirective from "@/directive/focus";
-import {
-  ElInput,
-  ElScrollbar,
-  ElEmpty,
-  ElButton,
-  ElCheckbox,
-  ElMessage,
-} from "element-plus";
+import { defineComponent, ref } from 'vue'
+import foucsDirective from '@/directive/focus'
+import { ElInput, ElScrollbar, ElEmpty, ElButton, ElCheckbox, ElMessage } from 'element-plus'
 
 interface IListData {
-  value: string;
-  finish: boolean;
+  value: string
+  finish: boolean
 }
 
 export default defineComponent({
   directives: { focus: foucsDirective },
   setup() {
-    const content = ref<string>("");
-    const list = ref<IListData[]>([]);
+    const content = ref<string>('')
+    const list = ref<IListData[]>([])
 
     function addList() {
       if (!content.value) {
-        ElMessage.warning("请输入todo信息");
-        return;
+        ElMessage.warning('请输入todo信息')
+        return
       }
       list.value.push({
         value: content.value,
-        finish: false,
-      });
-      content.value = "";
+        finish: false
+      })
+      content.value = ''
     }
 
     function delItem(index: number) {
-      list.value.splice(index, 1);
+      list.value.splice(index, 1)
     }
 
     return () => (
@@ -47,12 +40,12 @@ export default defineComponent({
               <ElButton
                 icon="el-icon-circle-plus-outline"
                 {...{
-                  onClick: addList,
+                  onClick: addList
                 }}
               >
                 添加
               </ElButton>
-            ),
+            )
           }}
         />
 
@@ -64,7 +57,7 @@ export default defineComponent({
               <div
                 class="list-item"
                 style={{
-                  textDecoration: data.finish ? "line-through" : "none",
+                  textDecoration: data.finish ? 'line-through' : 'none'
                 }}
                 key={index}
               >
@@ -78,8 +71,8 @@ export default defineComponent({
                   icon="el-icon-delete"
                   {...{
                     onClick: () => {
-                      delItem(index);
-                    },
+                      delItem(index)
+                    }
                   }}
                 >
                   删除
@@ -89,6 +82,6 @@ export default defineComponent({
           )}
         </ElScrollbar>
       </div>
-    );
-  },
-});
+    )
+  }
+})

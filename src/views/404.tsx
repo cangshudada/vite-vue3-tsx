@@ -1,10 +1,10 @@
-import { defineComponent } from "vue";
-import { ElEmpty, ElButton } from "element-plus";
-import { useRouter } from "vue-router";
+import { defineComponent } from 'vue'
+import { ElEmpty, ElButton } from 'element-plus'
+import { useRouter } from 'vue-router'
 
 export default defineComponent({
   setup() {
-    const router = useRouter();
+    const router = useRouter()
 
     return () => (
       <ElEmpty description="404 NOT FOUND" class="404-page">
@@ -12,13 +12,13 @@ export default defineComponent({
           type="primary"
           {...{
             onClick: () => {
-              router.push({ name: "login" });
-            },
+              router.push({ name: 'login' })
+            }
           }}
         >
           返回首页
         </ElButton>
       </ElEmpty>
-    );
-  },
-});
+    )
+  }
+})

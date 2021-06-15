@@ -1,17 +1,17 @@
-import { ObjectDirective } from "vue";
+import { ObjectDirective } from 'vue'
 
-const foucsDirective: ObjectDirective<HTMLElement, any> = {
+const foucsDirective: ObjectDirective<HTMLElement, unknown> = {
   mounted(el) {
     switch (el.tagName) {
-      case "INPUT":
-        el.focus();
-        break;
+      case 'INPUT':
+        el.focus()
+        break
       default:
-        const input = el.querySelector("input");
-        input?.focus();
-        break;
+        const input = el.querySelector('input')
+        input?.focus()
+        break
     }
-  },
-};
+  }
+}
 
-export default foucsDirective;
+export default foucsDirective

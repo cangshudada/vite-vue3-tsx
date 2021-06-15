@@ -1,25 +1,25 @@
-import { Module } from "vuex";
-import { SET_VALUE } from "./actionType";
+import { Module } from 'vuex'
+import { SET_VALUE } from './actionType'
 
 export interface IHomeStore {
-  value: string;
+  value: string
 }
 
-const HomeStore: Module<IHomeStore, {}> = {
+const HomeStore: Module<IHomeStore, Record<string, unknown>> = {
   namespaced: true,
   state: {
-    value: "",
+    value: ''
   },
   mutations: {
     [SET_VALUE](state, payload: string) {
-      state.value = payload;
-    },
+      state.value = payload
+    }
   },
   actions: {
     [SET_VALUE]({ commit }, payload: string) {
-      commit(SET_VALUE, payload);
-    },
-  },
-};
+      commit(SET_VALUE, payload)
+    }
+  }
+}
 
-export default HomeStore;
+export default HomeStore
